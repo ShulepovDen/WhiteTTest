@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_2/CategoryList.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import 'ProductList.dart';
 
@@ -39,10 +40,17 @@ class _ProductWidgetState extends State<ProductWidget> {
                           children: <Widget>[
                             ListTile(
                               leading: Container(
-                                  width: 30,
-                                  height: 30,
-                                  child: Image.asset(
-                                      'assets/images/istockphoto.jpg')),
+                                width: 30,
+                                height: 30,
+                                child: CachedNetworkImage(
+                                  imageUrl: product.imageUrl.toString(),
+                                  placeholder: (context, url) =>
+                                      CircularProgressIndicator(),
+                                  errorWidget: (context, url, error) =>
+                                      Icon(Icons.error),
+                                ),
+                                //child: Image.asset('assets/images/istockphoto.jpg')
+                              ),
                               // Image.network(product.imageUrl,
                               //     fit: BoxFit.cover,
                               //     errorBuilder: (context, error, stackTrace) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_2/ProductList.dart';
 import 'package:get/get.dart';
-
+import 'package:cached_network_image/cached_network_image.dart';
 import 'CategoryList.dart';
 import 'ProductGridView.dart';
 
@@ -44,11 +45,19 @@ class _CategoryWidgetState extends State<CategoryWidget> {
                         ),
                       ),
                       subtitle: Container(
-                          padding: EdgeInsets.only(top: 20),
-                          width: 100,
-                          height: 100,
-                          alignment: Alignment.center,
-                          child: Image.asset('assets/images/istockphoto.jpg')),
+                        padding: EdgeInsets.only(top: 20),
+                        width: 100,
+                        height: 100,
+                        alignment: Alignment.center,
+                        child: CachedNetworkImage(
+                          imageUrl: category.imageUrl.toString(),
+                          placeholder: (context, url) =>
+                              CircularProgressIndicator(),
+                          errorWidget: (context, url, error) =>
+                              Icon(Icons.error),
+                        ),
+                        //child: Image.asset('assets/images/istockphoto.jpg')
+                      ),
                       // Image.network(product.imageUrl,
                       //     fit: BoxFit.cover,
                       //     errorBuilder: (context, error, stackTrace) {
