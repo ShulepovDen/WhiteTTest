@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_2/CategoryList.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:extended_image/extended_image.dart';
 
 import 'ProductList.dart';
 
@@ -40,24 +40,68 @@ class _ProductWidgetState extends State<ProductWidget> {
                           children: <Widget>[
                             ListTile(
                               leading: Container(
-                                width: 30,
-                                height: 30,
-                                child: CachedNetworkImage(
-                                  imageUrl: product.imageUrl.toString(),
-                                  placeholder: (context, url) =>
-                                      CircularProgressIndicator(),
-                                  errorWidget: (context, url, error) =>
-                                      Icon(Icons.error),
+                                width: 50,
+                                height: 50,
+                                child: ExtendedImage.network(
+                                  product.imageUrl.toString(),
+                                  width: 50,
+                                  height: 50,
+                                  fit: BoxFit.fill,
+                                  cache: false,
+                                  loadStateChanged: (ExtendedImageState state) {
+                                    switch (state.extendedImageLoadState) {
+                                      case LoadState.loading:
+                                        return Image.asset(
+                                          "assets/images/retrowave.gif",
+                                          fit: BoxFit.fill,
+                                        );
+                                        break;
+
+                                      ///if you don't want override completed widget
+                                      ///please return null or state.completedWidget
+                                      //return null;
+                                      //return state.completedWidget;
+                                      case LoadState.completed:
+                                        return FadeTransition(
+                                          opacity:
+                                              AlwaysStoppedAnimation<double>(1),
+                                          child: ExtendedRawImage(
+                                            image:
+                                                state.extendedImageInfo?.image,
+                                            width: 50,
+                                            height: 50,
+                                          ),
+                                        );
+                                        break;
+                                      case LoadState.failed:
+                                        return GestureDetector(
+                                          child: Stack(
+                                            fit: StackFit.expand,
+                                            children: <Widget>[
+                                              Image.asset(
+                                                "assets/images/istockphoto.jpg",
+                                                fit: BoxFit.fill,
+                                              ),
+                                              const Positioned(
+                                                bottom: 0.0,
+                                                left: 0.0,
+                                                right: 0.0,
+                                                child: Text(
+                                                  "failed, click to reload",
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                          onTap: () {
+                                            state.reLoadImage();
+                                          },
+                                        );
+                                        break;
+                                    }
+                                  },
                                 ),
-                                //child: Image.asset('assets/images/istockphoto.jpg')
                               ),
-                              // Image.network(product.imageUrl,
-                              //     fit: BoxFit.cover,
-                              //     errorBuilder: (context, error, stackTrace) {
-                              //   return Image.asset(
-                              //       'assets/images/istockphoto.jpg',
-                              //       fit: BoxFit.fitWidth);
-                              // })
                               title: Text("Цена: " + product.price.toString()),
                             ),
                             ListTile(
@@ -86,35 +130,3 @@ class _ProductWidgetState extends State<ProductWidget> {
         ));
   }
 }
-
-// class SimpleWidget extends StatelessWidget {
-//   SimpleWidget({Key? key}) : super(key: key) {
-//     // loadProduct();
-//   }
-//   final items = List.generate(50, (index) => index);
-//   // loadProduct() async {
-//   //   final results = await ProductService().getProduct();
-//   //   print(results.length);
-//   //   results.forEach((element) {
-//   //     print(element.title);
-//   //   });
-//   // }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(title: Text('Product')),
-//       body: ListView.builder(
-//           itemCount: items.length,
-//           itemBuilder: (context, index) {
-//             final item = items[index];
-//             return ListTile(
-//               title: Text('Item $item'),
-//               subtitle: const Text('my subtitle'),
-//               onTap: () => {},
-//               trailing: const Icon(Icons.chevron_right_outlined),
-//             );
-//           }),
-//     );
-//   }
-// }

@@ -11,7 +11,7 @@ class Product {
   final String? productDescription;
   final int price;
   final double? rating;
-  final Image? image;
+  final String? image;
   final String? imageUrl;
   final int isAvailableForSale;
 
