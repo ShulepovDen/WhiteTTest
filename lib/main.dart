@@ -1,9 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'CategoryGridView.dart';
+import 'pages/category_grid_page.dart';
+import 'dart:io';
 
-void main() => runApp(MyWidget());
+void main() {
+  HttpOverrides.global = MyHttpOverrides();
+  runApp(
+    MyWidget(),
+  );
+}
 
 class MyWidget extends StatelessWidget {
   const MyWidget({super.key});
@@ -19,5 +25,14 @@ class MyWidget extends StatelessWidget {
         body: CategoryWidget(),
       ),
     );
+  }
+}
+
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
   }
 }
