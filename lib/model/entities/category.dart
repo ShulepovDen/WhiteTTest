@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:convert/convert.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-part 'category_template.g.dart';
+part 'category.g.dart';
 
 @JsonSerializable()
 class Category {
@@ -27,14 +27,4 @@ class Category {
   factory Category.fromJson(Map<String, dynamic> json) =>
       _$CategoryFromJson(json);
   Map<String, dynamic> toJson() => _$CategoryToJson(this);
-  // factory Category.fromJson(Map<String, dynamic> json) {
-  //   return Category(
-  //     categoryId: json['categoryId'],
-  //     title: json['title'],
-  //     imageUrl: json['imageUrl'],
-  //     hasSubcategories: json['hasSubcategories'],
-  //     fullName: json['fullName'],
-  //     categoryDescription: json['categoryDescription'],
-  //   );
-  // }
 }

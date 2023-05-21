@@ -22,7 +22,7 @@ class MyWidget extends StatelessWidget {
         // appBar: AppBar(
         //     // title: const Text('StatefullWidget'),
         //     title: Text('My Program')),
-        body: CategoryWidget(),
+        body: CategoryListPage(),
       ),
     );
   }

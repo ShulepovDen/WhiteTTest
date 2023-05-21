@@ -1,31 +1,47 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_2/model/entities/product_template.dart';
-import 'package:get/get.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import '../model/entities/category_template.dart';
-import '../view/extended_image_builder.dart';
+import '../model/entities/category.dart';
+import '../view/extended_image_widget.dart';
 import 'product_grid_page.dart';
-import 'package:extended_image/extended_image.dart';
 
-import '../model/api/api_control.dart';
+import '../model/api/base_api.dart';
 
-class CategoryWidget extends StatefulWidget {
-  const CategoryWidget({
+class CategoryListPage extends StatefulWidget {
+  const CategoryListPage({
     super.key,
   });
 
   @override
-  State<CategoryWidget> createState() => _CategoryWidgetState();
+  State<CategoryListPage> createState() => _CategoryListPageState();
 }
 
-class _CategoryWidgetState extends State<CategoryWidget> {
-  late Future<List> futureCategory;
+class _CategoryListPageState extends State<CategoryListPage> {
+  final CategoryApi categoryApi = CategoryApi();
+  final List<Category> categories = [];
+  bool isLoading = false;
   @override
   void initState() {
     super.initState();
-    futureCategory = BaseApi().loadList(
-      typeItemRequested: "category",
-    );
+    loadNextItems();
+  }
+
+  Future<void> reloadData() async {
+    categories.clear();
+    loadNextItems();
+  }
+
+  Future<void> loadNextItems() async {
+    if (isLoading) {
+      return;
+    }
+    setState(() {
+      isLoading = true;
+    });
+    List<Category> newCategories = await categoryApi.loadCategories();
+    categories.addAll(newCategories);
+
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
@@ -33,25 +49,18 @@ class _CategoryWidgetState extends State<CategoryWidget> {
     return Scaffold(
       appBar: buildAppBar(),
       body: Center(
-        child: FutureBuilder<List>(
-          future: futureCategory,
-          builder: (context, AsyncSnapshot snapshot) {
-            if (snapshot.hasData) {
-              return buildGridView(snapshot);
-            } else if (snapshot.hasError) {
-              return Text('ERROR: ${snapshot.error}');
-            }
-            return const CircularProgressIndicator();
-          },
-        ),
+        child: (isLoading && categories.isEmpty)
+            ? const CircularProgressIndicator()
+            : buildGridView(),
       ),
     );
+    ;
   }
 
-  GridView buildGridView(AsyncSnapshot<dynamic> snapshot) {
+  GridView buildGridView() {
     return GridView.builder(
       itemBuilder: (context, index) {
-        var category = snapshot.data?[index];
+        var category = categories[index];
         return ListTile(
           shape: RoundedRectangleBorder(
             side: BorderSide(width: 2),
@@ -69,7 +78,7 @@ class _CategoryWidgetState extends State<CategoryWidget> {
             width: 100,
             height: 100,
             alignment: Alignment.center,
-            child: buildExtendedImage(
+            child: ExtendedImageWidget(
                 widthImage: 100, heightImage: 100, category: category),
           ),
           onTap: () => ({openPage(context, category)}),
@@ -78,69 +87,9 @@ class _CategoryWidgetState extends State<CategoryWidget> {
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
       ),
-      itemCount: snapshot.data!.length,
+      itemCount: categories.length,
     );
   }
-
-  // ExtendedImage buildExtendedImage(Category category) {
-  //   return ExtendedImage.network(
-  //     category.imageUrl.toString(),
-  //     width: 100,
-  //     height: 100,
-  //     fit: BoxFit.fill,
-  //     cache: false,
-  //     loadStateChanged: (ExtendedImageState state) {
-  //       switch (state.extendedImageLoadState) {
-  //         case LoadState.loading:
-  //           return Image.asset(
-  //             "assets/images/istockphoto.jpg",
-  //             fit: BoxFit.fill,
-  //           );
-  //           break;
-
-  //         ///if you don't want override completed widget
-  //         ///please return null or state.completedWidget
-  //         //return null;
-  //         //return state.completedWidget;
-  //         case LoadState.completed:
-  //           return FadeTransition(
-  //             opacity: AlwaysStoppedAnimation<double>(1),
-  //             child: ExtendedRawImage(
-  //               image: state.extendedImageInfo?.image,
-  //               width: 100,
-  //               height: 100,
-  //             ),
-  //           );
-  //           break;
-  //         case LoadState.failed:
-  //           return GestureDetector(
-  //             child: Stack(
-  //               fit: StackFit.expand,
-  //               children: <Widget>[
-  //                 Image.asset(
-  //                   "assets/images/istockphoto.jpg",
-  //                   fit: BoxFit.fill,
-  //                 ),
-  //                 Positioned(
-  //                   bottom: 0.0,
-  //                   left: 0.0,
-  //                   right: 0.0,
-  //                   child: Text(
-  //                     "load image failed, click to reload",
-  //                     textAlign: TextAlign.center,
-  //                   ),
-  //                 )
-  //               ],
-  //             ),
-  //             onTap: () {
-  //               state.reLoadImage();
-  //             },
-  //           );
-  //           break;
-  //       }
-  //     },
-  //   );
-  // }
 
   PreferredSizeWidget buildAppBar() => AppBar(
         title: Text('Категории'),
@@ -150,7 +99,7 @@ class _CategoryWidgetState extends State<CategoryWidget> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ProductWidget(
+        builder: (context) => ProductListPage(
           category: category,
         ),
       ),

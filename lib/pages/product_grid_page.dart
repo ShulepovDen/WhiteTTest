@@ -1,52 +1,58 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_application_2/model/entities/category_template.dart';
-import 'package:extended_image/extended_image.dart';
-import 'package:flutter_application_2/model/variable/lists.dart';
-import 'package:flutter_application_2/model/variable/offset.dart';
+import 'package:flutter_application_2/model/entities/category.dart';
 
-import '../model/entities/product_template.dart';
-import '../model/api/api_control.dart';
-import '../view/card_builder.dart';
-import '../view/extended_image_builder.dart';
-import '../view/list_view_builder.dart';
+import '../model/entities/product.dart';
+import '../model/api/base_api.dart';
+import '../view/product_list_item.dart';
 
-class ProductWidget extends StatefulWidget {
-  final Category category;
-  const ProductWidget({Key? key, required this.category});
+class ProductListPage extends StatefulWidget {
+  final Category? category;
+  const ProductListPage({super.key, required this.category});
 
   @override
-  State<ProductWidget> createState() => _ProductWidgetState(
-        this.category,
-      );
+  State<ProductListPage> createState() => _ProductListPageState();
 }
 
-class _ProductWidgetState extends State<ProductWidget> {
-  Category category;
-  late Future<List> futureProducts;
-  _ProductWidgetState(this.category);
+class _ProductListPageState extends State<ProductListPage> {
+  final ProductApi productApi = ProductApi();
+  final List<Product> products = [];
+  bool isLoading = false;
   ScrollController _controller = ScrollController();
 
   @override
   void initState() {
     _controller.addListener(_onScrollEvent);
     super.initState();
-    futureProducts = BaseApi().loadList(
-      typeItemRequested: "product",
-      category: category,
+    loadNextItems();
+  }
+
+  Future<void> reloadData() async {
+    products.clear();
+    loadNextItems();
+  }
+
+  Future<void> loadNextItems() async {
+    if (isLoading) {
+      return;
+    }
+    setState(() {
+      isLoading = true;
+    });
+    List<Product> newProducts = await productApi.loadProducts(
+      parentCategory: widget.category,
+      offset: products.length,
     );
+    products.addAll(newProducts);
+
+    setState(() {
+      isLoading = false;
+    });
   }
 
   void _onScrollEvent() {
     final extentAfter = _controller.position.extentAfter;
-    // print("Extent after: $extentAfter");
     if (extentAfter <= 10) {
-      futureProducts = BaseApi().loadList(
-        typeItemRequested: "product",
-        category: category,
-        offset: offsetProduct.toString(),
-      );
+      loadNextItems();
       setState(() {});
     }
   }
@@ -55,63 +61,41 @@ class _ProductWidgetState extends State<ProductWidget> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        listProduct.clear();
-        offsetProduct = 0;
         return true;
       },
       child: Scaffold(
         appBar: buildAppBar(),
         body: Center(
-          child: FutureBuilder<List>(
-            future: futureProducts,
-            builder: ((context, AsyncSnapshot snapshot) {
-              if (snapshot.hasData) {
-                return buldListView(snapshot, _controller);
-              } else if (snapshot.hasError) {
-                return Text('ERROR: ${snapshot.error}');
-              }
-              return const CircularProgressIndicator();
-            }),
-          ),
+          child: (isLoading && products.isEmpty)
+              ? const CircularProgressIndicator()
+              : buldListView(),
         ),
       ),
     );
   }
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Scaffold(
-  //     appBar: buildAppBar(),
-  //     body: Center(
-  //       child: FutureBuilder<List>(
-  //         future: futureProducts,
-  //         builder: ((context, AsyncSnapshot snapshot) {
-  //           if (snapshot.hasData) {
-  //             return buldListView(snapshot);
-  //           } else if (snapshot.hasError) {
-  //             return Text('ERROR: ${snapshot.error}');
-  //           }
-  //           return const CircularProgressIndicator();
-  //         }),
-  //       ),
-  //     ),
-  //   );
-  // }
+
+  ListView buldListView() {
+    return ListView.separated(
+        controller: _controller,
+        itemBuilder: (context, index) {
+          var product = products[index];
+          return ProductListItem(product: product);
+        },
+        separatorBuilder: ((context, index) {
+          return const Divider(color: Colors.black26);
+        }),
+        itemCount: products.length);
+  }
+
+  Future<List<Product>> appendElements(Future<List<Product>> listFuture,
+      Future<List<Product>> elementsToAdd) async {
+    final list = await listFuture;
+    final listAdd = await elementsToAdd;
+    list.addAll(listAdd);
+    return list;
+  }
 
   AppBar buildAppBar() => AppBar(
-        title: Text(category.title),
-        // actions: [
-        //   IconButton(
-        //     icon: const Icon(Icons.shopping_cart),
-        //     tooltip: 'Open shopping cart',
-        //     onPressed: () {
-        //       futureProducts = BaseApi().loadList(
-        //         typeItemRequested: "product",
-        //         category: category,
-        //         offset: offsetProduct.toString(),
-        //       );
-        //       setState(() {});
-        //     },
-        //   ),
-        // ],
+        title: Text(widget.category != null ? widget.category!.title : ""),
       );
 }
