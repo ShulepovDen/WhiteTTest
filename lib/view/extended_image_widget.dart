@@ -17,6 +17,7 @@ class ExtendedImageWidget extends StatelessWidget {
       this.category,
       required this.widthImage,
       required this.heightImage});
+
   @override
   Widget build(BuildContext context) {
     return ExtendedImage.network(

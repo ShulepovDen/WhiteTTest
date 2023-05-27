@@ -11,6 +11,7 @@ class ProductListItem extends StatelessWidget {
     super.key,
     required this.product,
   });
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -26,13 +27,12 @@ class ProductListItem extends StatelessWidget {
             ),
             title: Text("Цена: " + product.price.toString()),
           ),
-          ListTile(
-            dense: true,
-            visualDensity: VisualDensity(vertical: -3),
-            title: Text(product.productDescription.toString() != "null"
-                ? product.productDescription.toString()
-                : ''),
-          )
+          if (product.productDescription?.isNotEmpty ?? false)
+            ListTile(
+              dense: true,
+              visualDensity: VisualDensity(vertical: -3),
+              title: Text(product.productDescription ?? ""),
+            )
         ],
       ),
     );
