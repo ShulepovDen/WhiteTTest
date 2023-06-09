@@ -11,12 +11,13 @@ class ExtendedImageWidget extends StatelessWidget {
   final double heightImage;
   Product? product;
   Category? category;
-  ExtendedImageWidget(
-      {super.key,
-      this.product,
-      this.category,
-      required this.widthImage,
-      required this.heightImage});
+  ExtendedImageWidget({
+    super.key,
+    this.product,
+    this.category,
+    required this.widthImage,
+    required this.heightImage,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -24,8 +25,8 @@ class ExtendedImageWidget extends StatelessWidget {
       product?.imageUrl.toString() ??
           category?.imageUrl.toString() ??
           "assets/images/istockphoto.jpg",
-      width: widthImage > 100 ? 50 : widthImage,
-      height: heightImage > 100 ? 50 : heightImage,
+      width: widthImage,
+      height: heightImage,
       fit: BoxFit.fill,
       cache: false,
       loadStateChanged: (ExtendedImageState state) {

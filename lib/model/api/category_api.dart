@@ -21,10 +21,13 @@ class CategoryApi extends BaseApi {
     final List<Category> list = [];
     var dataJson = jsonResponse['data'];
     var categoriesJson = dataJson['categories'];
-    for (var categoryJson in categoriesJson) {
-      var categoryItem = Category.fromJson(categoryJson);
-      list.add(categoryItem);
+    if (categoriesJson != null) {
+      for (var categoryJson in categoriesJson) {
+        var categoryItem = Category.fromJson(categoryJson);
+        list.add(categoryItem);
+      }
     }
+
     return list;
   }
 }

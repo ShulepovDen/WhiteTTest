@@ -31,5 +31,5 @@ class CategoryPageModelView extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool get shouldShowListLoader => (isLoading && products.isEmpty);
+  bool get shouldShowListLoader => (isLoading && categories.isEmpty);
 }
