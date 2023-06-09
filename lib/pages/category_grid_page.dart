@@ -20,6 +20,7 @@ class _CategoryGridPageState extends State<CategoryGridPage> {
   late CategoryPageModelView categoryListModelView;
 
   bool isLoading = false;
+
   @override
   void initState() {
     categoryListModelView = CategoryPageModelView();

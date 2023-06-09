@@ -24,6 +24,7 @@ class Category {
     required this.fullName,
     required this.categoryDescription,
   });
+
   factory Category.fromJson(Map<String, dynamic> json) =>
       _$CategoryFromJson(json);
   Map<String, dynamic> toJson() => _$CategoryToJson(this);

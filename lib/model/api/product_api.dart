@@ -22,9 +22,11 @@ class ProductApi extends BaseApi {
     );
     final List<Product> list = [];
     var dataJson = jsonResponse['data'];
-    for (var categoryJson in dataJson) {
-      var categoryItem = Product.fromJson(categoryJson);
-      list.add(categoryItem);
+    if (dataJson != null) {
+      for (var categoryJson in dataJson) {
+        var categoryItem = Product.fromJson(categoryJson);
+        list.add(categoryItem);
+      }
     }
     return list;
   }

@@ -7,6 +7,7 @@ import 'extended_image_widget.dart';
 
 class ProductListItem extends StatelessWidget {
   final Product product;
+
   const ProductListItem({
     super.key,
     required this.product,

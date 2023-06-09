@@ -27,7 +27,6 @@ class CategoryApi extends BaseApi {
         list.add(categoryItem);
       }
     }
-
     return list;
   }
 }

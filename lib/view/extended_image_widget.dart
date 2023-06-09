@@ -11,6 +11,7 @@ class ExtendedImageWidget extends StatelessWidget {
   final double heightImage;
   Product? product;
   Category? category;
+
   ExtendedImageWidget({
     super.key,
     this.product,
@@ -37,11 +38,6 @@ class ExtendedImageWidget extends StatelessWidget {
               fit: BoxFit.fill,
             );
             break;
-
-          ///if you don't want override completed widget
-          ///please return null or state.completedWidget
-          //return null;
-          //return state.completedWidget;
           case LoadState.completed:
             return FadeTransition(
               opacity: AlwaysStoppedAnimation<double>(1),

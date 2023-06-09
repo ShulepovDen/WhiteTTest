@@ -6,6 +6,7 @@ import 'extended_image_widget.dart';
 
 class CategoryGridItem extends StatelessWidget {
   final Category category;
+
   const CategoryGridItem({
     super.key,
     required this.category,
